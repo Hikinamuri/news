@@ -142,19 +142,37 @@ html::-webkit-scrollbar {
     justify-content: center;
     gap: 20px;
 }
+
 .news_card {
     display: flex;
     flex-direction: column;
     border: 1px solid #dcdcdc;
     max-width: 400px;
     width: 100%;
-    padding: 1em;
+    padding: 0 0 16px 0;
     border-radius: 10px;
     background: #ffffff;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     overflow: hidden;
     text-overflow: ellipsis;
+
+    .news_img {
+        min-width: 300px;
+        width: fit-content;
+        max-width: 370px;
+    }
+
+    .news_img img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+
+    .news_desc {
+        padding: 0 16px;
+    }
 }
 
 .news_card:hover {
@@ -200,3 +218,87 @@ html::-webkit-scrollbar {
     -webkit-box-orient: vertical;
 }
 
+.Modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    overflow: auto; /* Добавляем прокрутку для всего модального окна */
+}
+
+.ModalContent {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh; /* Ограничиваем высоту контента */
+    overflow-y: auto; /* Добавляем вертикальную прокрутку */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.ModalContent h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.ModalContent form {
+    display: flex;
+    flex-direction: column;
+}
+
+.ModalContent label {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+.ModalContent input,
+.ModalContent textarea,
+.ModalContent select {
+    margin-bottom: 16px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #dcdcdc;
+    color: black;
+}
+
+.ModalContent input[type="file"] {
+    padding: 4px;
+}
+
+.ModalContent button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+}
+
+.ModalContent button[type="submit"] {
+    background-color: #28a745;
+    color: white;
+}
+
+.ModalContent button[type="submit"]:hover {
+    background-color: #218838;
+}
+
+.ModalContent button[type="button"] {
+    background-color: #dc3545;
+    color: white;
+}
+
+.ModalContent button[type="button"]:hover {
+    background-color: #c82333;
+}

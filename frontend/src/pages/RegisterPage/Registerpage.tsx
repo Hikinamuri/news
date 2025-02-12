@@ -5,8 +5,6 @@ import styles from './index.module.css';
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
     fullName: '',
-    dateOfBirth: '',
-    phoneNumber: '',
     email: '',
     password: ''
   });
@@ -22,11 +20,9 @@ const RegisterForm = () => {
     setError(null);
     try {
         const response = await axios.post('http://127.0.0.1:8000/register', {
-            full_name: formData.fullName,
-            phone_number: formData.phoneNumber,
+            FIO: formData.fullName,
             email: formData.email,
             password: formData.password,
-            date_of_birth: formData.dateOfBirth,
         });
       alert(response.data.message);
     } catch (error) {
@@ -45,21 +41,6 @@ const RegisterForm = () => {
                 name="fullName"
                 placeholder="ФИО"
                 value={formData.fullName}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="date"
-                name="dateOfBirth"
-                value={formData.dateOfBirth}
-                onChange={handleChange}
-                required
-            />
-            <input
-                type="text"
-                name="phoneNumber"
-                placeholder="Номер телефона"
-                value={formData.phoneNumber}
                 onChange={handleChange}
                 required
             />

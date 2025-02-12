@@ -25,6 +25,7 @@ const LoginForm = () => {
             if (response.status === 200) {
                 navigate('/home')
                 localStorage.setItem('user_id', response.data.user_id);
+                localStorage.setItem('user_role', response.data.role);
             }
         } catch (error) {
         setError('Неверный email или пароль.');

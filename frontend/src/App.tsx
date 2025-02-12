@@ -21,7 +21,6 @@ function App() {
             <Route path='home' element={<Home />}/>
             <Route path='calendar' element={<CalendarPage />}/>
             <Route path='profile' element={<UserProfile />}/>
-
           </Route>
 
           <Route path='/register' element={<RegisterForm />}/>

@@ -6,5 +6,9 @@ export interface News {
     link: string,
     category: string,
     ageGroup: string,
-    isFree: boolean
+    isFree: boolean,
+    maxCount: number,
+    location: string,
+    images: [],
+    news_type: string,
 }

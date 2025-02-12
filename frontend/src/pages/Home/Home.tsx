@@ -8,12 +8,12 @@ import { News } from '../../types/event'
 
 
 export const Home = () => {
-
+    const userRole = localStorage.getItem('user_role');
     const [nearestEvents, setNearestEvents] = useState<News[]>([])
     const [importantEvents, setImportantEvents] = useState<News[]>([])
     const [aboutCompanies, setAboutCompanies] = useState<News[]>([])
 
-    const allNews = [...nearestEvents, ...importantEvents, ...aboutCompanies];
+    const [allNews, setAllNews] = useState<News[]>([]);
 
     const [filteredEvents, setFilteredEvents] = useState(allNews);
 
@@ -25,7 +25,110 @@ export const Home = () => {
         ageGroup: '',
         isFree: null
     });
+    const [showForm, setShowForm] = useState(false);
+    const [newEvent, setNewEvent] = useState<Partial<News>>({
+        title: "",
+        description: "",
+        date: "",
+        // link: "",
+        category: "",
+        ageGroup: "",
+        isFree: false,
+        maxCount: 0,
+        location: "",
+        images: [],
+        news_type: ''
+    });
+    const [imageFile, setImageFile] = useState<string>();
 
+    const handleAddEvent = () => {
+        setShowForm(true);
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        const { name, value } = e.target;
+        setNewEvent(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+    
+            reader.onloadend = () => {
+                const base64String = reader.result as string; // Base64 string
+                console.log(base64String); // You can now send this to your API or use it as needed
+                setImageFile(base64String); // Store Base64 string in state for later use
+            };
+    
+            reader.readAsDataURL(file); // Converts the file to Base64
+        }
+    };    
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+    
+        if (!newEvent.title || !newEvent.description || !newEvent.date) {
+            alert("Пожалуйста, заполните все обязательные поля.");
+            return;
+        }
+    
+        const requestBody = {
+            title: newEvent.title,
+            description: newEvent.description,
+            date: newEvent.date,
+            // link: newEvent.link,
+            category: newEvent.category,
+            ageGroup: newEvent.ageGroup,
+            isFree: newEvent.isFree,
+            maxCount: newEvent.maxCount,
+            location: newEvent.location,
+            images: imageFile ? [imageFile] : [],
+            news_type: newEvent.news_type
+        };
+    
+        try {
+            const response = await fetch("http://localhost:8000/news", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json", // Set content type to JSON
+                },
+                body: JSON.stringify(requestBody), // Convert the data to a JSON string
+            });
+    
+            if (!response.ok) {
+                throw new Error("Ошибка при создании события.");
+            }
+    
+            const result = await response.json();
+            console.log("Новость успешно добавлена:", result);
+    
+            setShowForm(false);
+            setNewEvent({
+                title: "",
+                description: "",
+                date: "",
+                // link: "",
+                category: "",
+                ageGroup: "",
+                isFree: false,
+                maxCount: 0,
+                location: "",
+                images: []
+            });
+    
+            setNearestEvents(prev => [...prev, result]);
+    
+        } catch (error) {
+            console.error("Ошибка:", error);
+        }
+    };
+    
+    
+    
     const handleFilterChange = (filterType: string, value: string | boolean | null) => {
         setFilter(prev => ({
             ...prev,
@@ -52,13 +155,14 @@ export const Home = () => {
             return matches;
         }).filter(event => {
             if (searchQuery) {
+                console.log(allNews)
                 return event.title.toLowerCase().includes(searchQuery) ||
                        event.description.toLowerCase().includes(searchQuery);
             }
             return true;
         });
     };
-
+    
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const query = e.target.value.toLowerCase();
         setSearchQuery(query);
@@ -73,204 +177,38 @@ export const Home = () => {
     //     // Здесь можно добавить логику для фильтрации событий по дате
     // };
 
+    const fetchNews = async () => {
+        try {
+            const response = await fetch("http://localhost:8000/news/");
+            if (response.ok) {
+                const data = await response.json();
+                setNearestEvents(data.filter((event: any) => event.news_type === "nearest"));
+                setImportantEvents(data.filter((event: any) => event.news_type === "important"));
+                setAboutCompanies(data.filter((event: any) => event.news_type === "about"));
+            } else {
+                throw new Error("Ошибка при получении новостей.");
+            }
+        } catch (error) {
+            console.error("Ошибка загрузки данных:", error);
+        }
+    };
+
     useEffect(() => {
-        setNearestEvents(
-            [
-                {
-                    id: 1,
-                    title: "Молодежный центр \"Хыял\"",
-                    description: `
-                        <p>Желаем всем хорошей недели и отличного настроения!</p>
-                        <p>На этой неделе много классных мероприятий:</p>
-                        <ul>
-                            <li>14 января — Игры на свежем воздухе "Зимние забавы".</li>
-                            <li>МБОУ "Мало-Лызитская СОШ".</li>
-                        </ul>
-                    `,
-                    date: "22 января 17:00",
-                    link: "#",
-                    category: "cultural",
-                    ageGroup: "children",
-                    isFree: true
-                },
-                {
-                    id: 2,
-                    title: "Центр досуга \"Север\"",
-                    description: `
-                        <p>Приглашаем на серию мастер-классов:</p>
-                        <ul>
-                            <li>15 января — Гончарное искусство.</li>
-                            <li>16 января — Рисование акварелью.</li>
-                        </ul>
-                    `,
-                    date: "15-16 января 15:00",
-                    link: "#",
-                    category: "sports",
-                    ageGroup: "teenagers",
-                    isFree: true
-                },
-                {
-                    id: 3,
-                    title: "Библиотека №5",
-                    description: `
-                        <p>Присоединяйтесь к обсуждению любимых книг!</p>
-                        <p>Клуб читателей собирается каждую пятницу.</p>
-                    `,
-                    date: "19 января 18:00",
-                    link: "#",
-                    category: "educational",
-                    ageGroup: "teenagers",
-                    isFree: true
-                },
-                {
-                    id: 4,
-                    title: "Дом культуры \"Юбилейный\"",
-                    description: `
-                        <p>В субботу пройдет вечер ретро-танцев!</p>
-                        <p>Приходите танцевать под любимые хиты 80-х и 90-х.</p>
-                        <ul>
-                            <li>Дата: 20 января</li>
-                            <li>Время: 18:00</li>
-                        </ul>
-                    `,
-                    date: "20 января 18:00",
-                    link: "#",
-                    category: "cultural",
-                    ageGroup: "adults",
-                    isFree: true
-                },
-                {
-                    id: 5,
-                    title: "Выставочный зал \"Галерея\"",
-                    description: `
-                        <p>Открытие новой выставки «Искусство природы».</p>
-                        <p>Выставка включает более 50 работ современных художников.</p>
-                        <ul>
-                            <li>21 января — день открытия, вход свободный!</li>
-                        </ul>
-                    `,
-                    date: "21 января 12:00",
-                    link: "#",
-                    category: "sports",
-                    ageGroup: "children",
-                    isFree: true
-                },
-                {
-                    id: 6,
-                    title: "Спортивный центр \"Олимп\"",
-                    description: `
-                        <p>Соревнования по настольному теннису для всех возрастов.</p>
-                        <p>Регистрируйтесь заранее для участия!</p>
-                        <ul>
-                            <li>Дата: 22 января</li>
-                            <li>Время: 14:00</li>
-                        </ul>
-                    `,
-                    date: "22 января 14:00",
-                    link: "#",
-                    category: "educational",
-                    ageGroup: "children",
-                    isFree: true
-                }
-            ]
-        );        
-        setImportantEvents([
-            {
-                id: 7,
-                title: 'Национальный форум молодёжи',
-                description: 'Форум для обмена опытом среди молодых лидеров. Выступят известные спикеры.',
-                date: '25 января 10:00',
-                link: '#',
-                category: 'educational',
-                ageGroup: 'adults',
-                isFree: true
-            },
-            {
-                id: 8,
-                title: 'Всероссийский конкурс "Зимняя фантазия"',
-                description: 'Финал конкурса рисунков и поделок. Победителей ждут призы!',
-                date: '22 января 14:00',
-                link: '#',
-                category: 'educational',
-                ageGroup: 'teenagers',
-                isFree: true
-            },
-            {
-                id: 9,
-                title: 'Конференция "Будущее технологий"',
-                description: 'Обсуждение новых технологий с участием ведущих специалистов.',
-                date: '19 января 13:00',
-                link: '#',
-                category: 'educational',
-                ageGroup: 'adults',
-                isFree: true
-            },
-            {
-                id: 10,
-                title: 'Молодежный конкурс "Самые красивые рисунки"',
-                description: 'Соревнование по созданию красивых рисунков. Победителей ждут призы!',
-                date: '15 января 12:00',
-                link: '#',
-                category: 'educational',
-                ageGroup: 'children',
-                isFree: false
-            },
-            {
-                id: 11,
-                title: 'Конкурс "Самые умные дети"',
-                description: 'Соревнование по развитию умств и души. Победителей ждут призы!',
-                date: '12 января 11:00',
-                link: '#',
-                category: 'educational',
-                ageGroup: 'children',
-                isFree: false
-            }
-        ]);
-        setAboutCompanies([
-            {
-                id: 12,
-                title: "Библиотека №5",
-                description: `
-                    <p>Присоединяйтесь к обсуждению любимых книг!</p>
-                    <p>Клуб читателей собирается каждую пятницу.</p>
-                `,
-                date: "19 января 18:00",
-                link: "#",
-                category: "cultural",
-                ageGroup: "adults",
-                isFree: false
-            },
-            {
-                id: 13,
-                title: "Центр досуга \"Север\"",
-                description: `
-                    <p>Приглашаем на серию мастер-классов:</p>
-                    <ul>
-                        <li>15 января — Гончарное искусство.</li>
-                        <li>16 января — Рисование акварелью.</li>
-                    </ul>
-                `,
-                date: "15-16 января 15:00",
-                link: "#",
-                category: "cultural",
-                ageGroup: "teenagers",
-                isFree: false
-            },
-            {
-                id: 14,
-                title: "Библиотека №5",
-                description: `
-                    <p>Присоединяйтесь к обсуждению любимых книг!</p>
-                    <p>Клуб читателей собирается каждую пятницу.</p>
-                `,
-                date: "19 января 18:00",
-                link: "#",
-                category: "cultural",
-                ageGroup: "adults",
-                isFree: false
-            }
-        ])
-    }, [])
+        fetchNews();
+    }, []);
+
+    useEffect(() => {
+        if (showForm) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
+    }, [showForm]);
+
+    useEffect(() => {
+        const allNews = [...nearestEvents, ...importantEvents, ...aboutCompanies]
+        setAllNews(allNews);
+    }, [nearestEvents, importantEvents, aboutCompanies]);
 
 
     return (
@@ -312,6 +250,11 @@ export const Home = () => {
                         <option value="false">Платные</option>
                     </select>
                 </div>
+                {userRole === "admin" && (
+                    <button onClick={handleAddEvent} className={cl.AddEventButton}>
+                        Добавить событие
+                    </button>
+                )}
             </div>
             
             <div className={cl.links}>
@@ -327,6 +270,79 @@ export const Home = () => {
                     onViewChange={({ view }) => setCalendarView(view)} 
                 />
             </div> */}
+            {showForm && (
+                <div className={cl.Modal}>
+                    <div className={cl.ModalContent}>
+                        <h2>Добавить новое событие</h2>
+                        <form onSubmit={handleSubmit}>
+                            <label>Название:</label>
+                            <input type="text" name="title" value={newEvent.title} onChange={handleInputChange} required />
+
+                            <label>Описание:</label>
+                            <textarea name="description" value={newEvent.description} onChange={handleInputChange} required />
+
+                            <label>Тип:</label>
+                            <select name="news_type" value={newEvent.news_type} onChange={handleInputChange} required>
+                                <option value="">Выберите тип</option>
+                                <option value="nearest">Ближайшие</option>
+                                <option value="important">Важные</option>
+                                <option value="about">О компании</option>
+                            </select>
+
+                            <label>Дата:</label>
+                            <input type="date" name="date" value={newEvent.date} onChange={handleInputChange} required />
+
+                            {/* <label>Ссылка:</label>
+                            <input type="text" name="link" value={newEvent.link} onChange={handleInputChange} required/> */}
+
+                            <label>Категория:</label>
+                            <select name="category" value={newEvent.category} onChange={handleInputChange} required>
+                                <option value="">Выберите категорию</option>
+                                <option value="sports">Спортивные</option>
+                                <option value="cultural">Культурные</option>
+                                <option value="educational">Образовательные</option>
+                            </select>
+
+                            <label>Возрастная группа:</label>
+                            <select name="ageGroup" value={newEvent.ageGroup} onChange={handleInputChange} required>
+                                <option value="">Выберите возрастную группу</option>
+                                <option value="children">Дети</option>
+                                <option value="teenagers">Подростки</option>
+                                <option value="adults">Взрослые</option>
+                            </select>
+
+                            <label>Бесплатное событие:</label>
+                            <select name="isFree" value={String(newEvent.isFree)} onChange={handleInputChange} required>
+                                <option value="true">Да</option>
+                                <option value="false">Нет</option>
+                            </select>
+
+                            <label>Максимальное количество участников:</label>
+                            <input
+                                type="number"
+                                name="maxCount"
+                                value={newEvent.maxCount}
+                                onChange={handleInputChange}
+                                min="0" // Запрещаем ввод отрицательных чисел
+                                onKeyPress={(e) => {
+                                    if (e.key === '-' || e.key === 'e' || e.key === 'E') {
+                                        e.preventDefault();
+                                    }
+                                }}
+                            />
+
+                            <label>Местоположение:</label>
+                            <input type="text" name="location" value={newEvent.location} onChange={handleInputChange} />
+
+                            <label>Изображение:</label>
+                            <input type="file" accept="image/*" onChange={handleImageChange} />
+
+                            <button type="submit">Создать</button>
+                            <button type="button" onClick={() => setShowForm(false)}>Отмена</button>
+                        </form>
+                    </div>
+                </div>
+            )}
             <div className={cl.Events}>
                 {
                     searchQuery || filter && ( filter.ageGroup || filter.category || filter.isFree ) ? (
@@ -335,13 +351,18 @@ export const Home = () => {
                             <div className={cl.news}>
                                 {filteredEvents.map((event) => (
                                     <div key={event.id} className={cl.news_card}>
-                                        <h3>{event.title}</h3>
-                                        <div 
-                                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description) }}
-                                            className={cl.news_description}
-                                        />
-                                        <p>{event.date}</p>
-                                        <a href={event.link}>Подробнее</a>
+                                        <div className={cl.news_img}>
+                                            <img src={event.images} alt="" />
+                                        </div>
+                                        <div className={cl.news_desc}>
+                                            <h3>{event.title}</h3>
+                                            <div 
+                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(event.description) }}
+                                                className={cl.news_description}
+                                            />
+                                            <p>{event.date}</p>
+                                            <a href={event.id}>Подробнее</a>
+                                        </div>
                                     </div>
                                 ))}
 
@@ -357,13 +378,18 @@ export const Home = () => {
                                 <div className={cl.news}>
                                     {nearestEvents.map((news, idx) => (
                                         <div key={idx} className={cl.news_card}>
-                                            <h3>{news.title}</h3>
-                                            <div 
-                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.description) }}
-                                                className={cl.news_description}
-                                            />
-                                            <p>{news.date}</p>
-                                            <a href={news.link}>Подробнее</a>
+                                            <div className={cl.news_img}>
+                                                <img src={news.images} alt="" />
+                                            </div>
+                                            <div className={cl.news_desc}>
+                                                <h3>{news.title}</h3>
+                                                <div 
+                                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.description) }}
+                                                    className={cl.news_description}
+                                                />
+                                                <p>{news.date}</p>
+                                                <a href={news.id}>Подробнее</a>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -373,13 +399,18 @@ export const Home = () => {
                                 <div className={cl.news}>
                                     {importantEvents.map((news, idx) => (
                                         <div key={idx} className={cl.news_card}>
-                                            <h3>{news.title}</h3>
-                                            <div 
-                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.description) }}
-                                                className={cl.news_description}
-                                            />
-                                            <p>{news.date}</p>
-                                            <a href={news.link}>Подробнее</a>
+                                            <div className={cl.news_img}>
+                                                <img src={news.images} alt="" />
+                                            </div>
+                                            <div className={cl.news_desc}>
+                                                <h3>{news.title}</h3>
+                                                <div 
+                                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.description) }}
+                                                    className={cl.news_description}
+                                                />
+                                                <p>{news.date}</p>
+                                                <a href={news.id}>Подробнее</a>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
@@ -389,13 +420,18 @@ export const Home = () => {
                                 <div className={cl.news}>
                                     {aboutCompanies.map((news, idx) => (
                                         <div key={idx} className={cl.news_card}>
-                                            <h3>{news.title}</h3>
-                                            <div 
-                                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.description) }}
-                                                className={cl.news_description}
-                                            />
-                                            <p>{news.date}</p>
-                                            <a href={news.link}>Подробнее</a>
+                                            <div className={cl.news_img}>
+                                                <img src={news.images} alt="" />
+                                            </div>
+                                            <div className={cl.news_desc}>
+                                                <h3>{news.title}</h3>
+                                                <div 
+                                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(news.description) }}
+                                                    className={cl.news_description}
+                                                />
+                                                <p>{news.date}</p>
+                                                <a href={news.id}>Подробнее</a>
+                                            </div>
                                         </div>
                                     ))}
                                 </div>
