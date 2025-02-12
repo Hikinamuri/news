@@ -9,6 +9,7 @@ import { CalendarPage } from './pages/CalendarPage/CalendarPage';
 import RegisterForm from './pages/RegisterPage/Registerpage';
 import LoginForm from './pages/AuthPage/AuthPage';
 import UserProfile from './pages/UserProfile/UserProfile';
+import NewsPage from './pages/newsPage/newsPage';
 
 function App() {
 
@@ -21,6 +22,7 @@ function App() {
             <Route path='home' element={<Home />}/>
             <Route path='calendar' element={<CalendarPage />}/>
             <Route path='profile' element={<UserProfile />}/>
+            <Route path='home/:id' element={<NewsPage />} />
           </Route>
 
           <Route path='/register' element={<RegisterForm />}/>

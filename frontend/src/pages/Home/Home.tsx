@@ -361,7 +361,7 @@ export const Home = () => {
                                                 className={cl.news_description}
                                             />
                                             <p>{event.date}</p>
-                                            <a href={event.id}>Подробнее</a>
+                                            <a href={`/home/${event.id}`}>Подробнее</a>
                                         </div>
                                     </div>
                                 ))}
@@ -388,7 +388,7 @@ export const Home = () => {
                                                     className={cl.news_description}
                                                 />
                                                 <p>{news.date}</p>
-                                                <a href={news.id}>Подробнее</a>
+                                                <a href={`/home/${news.id}`}>Подробнее</a>
                                             </div>
                                         </div>
                                     ))}
@@ -409,7 +409,7 @@ export const Home = () => {
                                                     className={cl.news_description}
                                                 />
                                                 <p>{news.date}</p>
-                                                <a href={news.id}>Подробнее</a>
+                                                <a href={`/home/${news.id}`}>Подробнее</a>
                                             </div>
                                         </div>
                                     ))}
@@ -430,7 +430,7 @@ export const Home = () => {
                                                     className={cl.news_description}
                                                 />
                                                 <p>{news.date}</p>
-                                                <a href={news.id}>Подробнее</a>
+                                                <a href={`/home/${news.id}`}>Подробнее</a>
                                             </div>
                                         </div>
                                     ))}

@@ -136,6 +136,10 @@ def create_news(news: NewsCreate, db: Session = Depends(get_db)):
 @app.get("/news/{news_id}")
 def get_news(news_id: int, db: Session = Depends(get_db)):
     db_news = db.query(News).filter(News.id == news_id).first()
+    
+    # Логирование для отладки
+    print(f"Запрашиваем новость с id: {news_id}")
+    
     if not db_news:
         raise HTTPException(status_code=404, detail="Новость не найдена")
 
@@ -144,7 +148,6 @@ def get_news(news_id: int, db: Session = Depends(get_db)):
         "title": db_news.title,
         "description": db_news.description,
         "date": db_news.date,
-        # "link": db_news.link,
         "category": db_news.category,
         "ageGroup": db_news.ageGroup,
         "isFree": db_news.isFree,
@@ -153,6 +156,7 @@ def get_news(news_id: int, db: Session = Depends(get_db)):
         "images": db_news.images.split(",") if db_news.images else [],
         "news_type": db_news.news_type,
     }
+
 
 
 @app.get("/news/")

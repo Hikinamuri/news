@@ -1,0 +1,107 @@
+/* NewsPage.module.css */
+
+/* Общий контейнер страницы новости */
+.newsPage {
+  max-width: 1200px;
+  width: 100%;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  font-family: 'Arial', sans-serif;
+  overflow: hidden; /* Чтобы контент не выходил за рамки */
+}
+
+/* Картинка в верхней части страницы */
+.newsImageContainer {
+  width: 100%;
+  height: 400px; /* Устанавливаем фиксированную высоту */
+  overflow: hidden;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.newsImageContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Картинка заполняет контейнер, сохраняя пропорции */
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Заголовок новости */
+.newsPage h2 {
+  font-size: 2.5rem;
+  margin: 0;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+/* Параграфы с информацией (дата, категория и т. д.) */
+.newsPage p {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  line-height: 1.8;
+  color: #555;
+  margin: 0;
+  margin-top: 5px;
+}
+
+/* Полужирный текст для меток */
+.newsPage p strong {
+  font-weight: bold;
+  color: #000;
+}
+
+/* Блок с описанием новости */
+.newsDescription {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #333;
+  text-align: justify;
+}
+
+/* Контейнер для изображений */
+.newsImages {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 30px;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Изображения внутри контейнера */
+.newsImages img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
+/* Эффект при наведении на изображения */
+.newsImages img:hover {
+  transform: scale(1.05);
+}
+
+/* Убедимся, что страницы не будут загружать слишком большое количество контента на маленьких экранах */
+@media (max-width: 768px) {
+  .newsPage {
+    padding: 20px;
+  }
+
+  .newsPage h2 {
+    font-size: 1.8rem;
+  }
+
+  .newsPage p {
+    font-size: 1rem;
+  }
+
+  .newsImageContainer {
+    height: 250px; /* Уменьшаем высоту картинки на маленьких экранах */
+  }
+}
