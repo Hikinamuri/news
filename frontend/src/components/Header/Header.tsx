@@ -17,7 +17,7 @@ export const Header = () => {
                 <div onClick={() => onClick('calendar')}>Календарь мероприятий</div>
                 <div >Галерея</div>
             </div>
-            <div className={cl.Header_profile_button}>
+            <div className={cl.Header_profile_button} onClick={() => onClick('profile')}>
                 Профиль
             </div>
         </header>
